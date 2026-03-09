@@ -29,7 +29,11 @@ variable "subnets" {
     }))
     default     = {
         "subnet1" = {
-            name             = "private-subnet1"
+            name             = "subnet1"
+            address_prefixes = ["10.0.0.0/24"]
+        }
+        "subnet2" = {
+            name             = "subnet2"
             address_prefixes = ["10.0.1.0/24"]
         }
     }
