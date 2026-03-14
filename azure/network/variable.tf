@@ -27,21 +27,32 @@ variable "address_space" {
     default     = ["10.0.0.0/16"]
 }
 
-variable "subnets" {
-    description = "Subnets for the virtual network"
-    type        = map(object({
-        name             = string
-        address_prefixes = list(string)
-    }))
-    default     = {
-        "private" = {
-            name             = "private-subnet1"
-            address_prefixes = ["10.0.1.0/24"]
+variable "public" {
+    description = "public subnets for the virtual network"
+    type = list(object({ name = string, cidr = list(string) }))
+    default = [
+        {
+            name = "public-subnet1"
+            cidr = ["10.0.1.0/24"]
+        },
+        {
+            name = "public-subnet2"
+            cidr = ["10.0.2.0/24"]
         }
-        "public" = {
-            name             = "public-subnet1"
-            address_prefixes = ["10.0.2.0/24"]
-        }
-    }
+    ]
 }
 
+variable "private" {
+    description = "private subnets for the virtual network"
+    type = list(object({ name = string, cidr = list(string) }))
+    default = [
+        {
+            name = "private-subnet1"
+            cidr = ["10.0.3.0/24"]
+        },
+        {
+            name = "private-subnet2"
+            cidr = ["10.0.4.0/24"]
+        }
+    ]
+}

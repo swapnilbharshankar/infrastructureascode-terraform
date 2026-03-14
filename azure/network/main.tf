@@ -1,13 +1,19 @@
 locals {
-    public_subnet = merge(
-        var.subnets.public,
-        {
-            route_table = {
-                id = azurerm_route_table.public.id
-            }
+    public_subnets = {
+        for i in range(length(var.private)) :
+        "${var.private[i].name}-${i}" => {
+            name             = var.private[i].name
+            address_prefixes = var.private[i].cidr
+            route_table_id   = azurerm_route_table.public.id
         }
-    )
-    private_subnet = var.subnets.private
+    }
+    private_subnets = {
+        for i in range(length(var.public)) :
+        "${var.public[i].name}-${i}" => {
+            name             = var.public[i].name
+            address_prefixes = var.public[i].cidr
+        }
+    }
 }
 
 module "avm-res-network-virtualnetwork" {
@@ -18,10 +24,7 @@ module "avm-res-network-virtualnetwork" {
     location        = var.location
     name            = var.name
     parent_id       = var.parent_id
-    subnets         = {
-        public = local.public_subnet
-        private = local.private_subnet
-    }
+    subnets         = merge(local.public_subnets, local.private_subnets)
 }
 
 
