@@ -1,17 +1,19 @@
 locals {
-    public_subnets = {
+    private_subnets = {
         for i in range(length(var.private)) :
         "${var.private[i].name}-${i}" => {
             name             = var.private[i].name
             address_prefixes = var.private[i].cidr
-            route_table_id   = azurerm_route_table.public.id
         }
     }
-    private_subnets = {
+    public_subnets = {
         for i in range(length(var.public)) :
         "${var.public[i].name}-${i}" => {
             name             = var.public[i].name
             address_prefixes = var.public[i].cidr
+            route_table = {
+                id = azurerm_route_table.public.id
+            }
         }
     }
 }
