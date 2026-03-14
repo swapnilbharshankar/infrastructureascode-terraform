@@ -2,8 +2,11 @@ locals {
     private_subnets = {
         for i in range(length(var.private)) :
         "${var.private[i].name}-${i}" => {
-            name             = "${var.name}${var.private[i].name}"
+            name             = "${var.name}-${var.private[i].name}"
             address_prefixes = var.private[i].cidr
+            route_table = {
+                id = azurerm_route_table.private.id
+            }
         }
     }
     public_subnets = {
@@ -29,7 +32,7 @@ module "avm-res-network-virtualnetwork" {
     subnets         = merge(local.public_subnets, local.private_subnets)
 }
 
-
+# public route table and route for internet access from public subnets
 resource "azurerm_route_table" "public" {
     location            = var.location
     name                = "${var.name}-public-route-table"
@@ -42,4 +45,11 @@ resource "azurerm_route" "public" {
     next_hop_type       = "Internet"
     resource_group_name = var.resource_group_name
     route_table_name    = azurerm_route_table.public.name
+}
+
+# private route table and route for internet access from private subnets via NAT gateway
+resource "azurerm_route_table" "private" {
+    location            = var.location
+    name                = "${var.name}-private-route-table"
+    resource_group_name = var.resource_group_name
 }
