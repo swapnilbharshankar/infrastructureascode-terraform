@@ -34,13 +34,13 @@ variable "subnets" {
         address_prefixes = list(string)
     }))
     default     = {
-        "subnet1" = {
-            name             = "subnet1"
-            address_prefixes = ["10.0.0.0/24"]
-        }
-        "subnet2" = {
-            name             = "subnet2"
+        "private" = {
+            name             = "private-subnet1"
             address_prefixes = ["10.0.1.0/24"]
+        }
+        "public" = {
+            name             = "public-subnet1"
+            address_prefixes = ["10.0.2.0/24"]
         }
     }
 }
