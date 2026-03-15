@@ -1,3 +1,33 @@
+# This ensures we have unique CAF compliant names for our resources.
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "0.4.2"
+}
+
+# Fetching the public IP address of the Terraform executor.
+data "http" "public_ip" {
+  method = "GET"
+  url    = "http://api.ipify.org?format=json"
+}
+
+resource "azurerm_network_security_group" "ssh" {
+  location            = var.location
+  name                = module.naming.network_security_group.name
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    access                     = "Allow"
+    destination_address_prefix = "*"
+    destination_port_range     = "22"
+    direction                  = "Inbound"
+    name                       = "test123"
+    priority                   = 100
+    protocol                   = "Tcp"
+    source_address_prefix      = jsondecode(data.http.public_ip.response_body).ip
+    source_port_range          = "*"
+  }
+}
+
 locals {
     private_subnets = {
         for i in range(length(var.private)) :
@@ -16,6 +46,9 @@ locals {
             address_prefixes = var.public[i].cidr
             route_table = {
                 id = azurerm_route_table.public.id
+            }
+            azurerm_network_security_group = {
+                id = azurerm_network_security_group.ssh.id
             }
         }
     }
