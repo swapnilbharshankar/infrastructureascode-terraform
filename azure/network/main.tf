@@ -47,7 +47,7 @@ locals {
             route_table = {
                 id = azurerm_route_table.public.id
             }
-            azurerm_network_security_group = {
+            network_security_group = {
                 id = azurerm_network_security_group.ssh.id
             }
         }
