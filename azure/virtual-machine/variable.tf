@@ -16,10 +16,16 @@ variable "resource_group_name" {
     default     = "azure-free"
 }
 
-variable "subnet_id" {
-    description = "ID of the subnet to which the VM will be connected"
+# variable "subnet_id" {
+#     description = "ID of the subnet to which the VM will be connected"
+#     type        = string
+#     default     = "id-of-the-subnet"
+# }
+
+variable "subnet_name" {
+    description = "Name of the subnet to which the VM will be connected"
     type        = string
-    default     = "id-of-the-subnet"
+    default     = "my-subnet"
 }
 
 variable "location" {
@@ -60,4 +66,10 @@ variable "source_image_reference" {
         sku       = "22_04-lts"
         version   = "latest"
     }
+}
+
+variable "create_public_ip_address" {
+    description = "Whether to create a public IP address for the virtual machine"
+    type        = bool
+    default     = false
 }

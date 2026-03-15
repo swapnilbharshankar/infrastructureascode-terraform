@@ -19,3 +19,4 @@ terragrunt
 .env
 .licensei.cache
 bin
+*.cache

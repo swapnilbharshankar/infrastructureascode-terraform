@@ -72,11 +72,11 @@ module "vm_sku" {
     depends_on = [random_integer.zone_index]
 }
 
-# data "azurerm_subnet" "subnet_data" {
-#   name                 = var.subnet_name
-#   virtual_network_name = var.vnet_name
-#   resource_group_name  = var.resource_group_name
-# }
+data "azurerm_subnet" "subnet_data" {
+  name                 = "${var.vnet_name}-${var.subnet_name}"
+  virtual_network_name = var.vnet_name
+  resource_group_name  = var.resource_group_name
+}
 
 module "avm-res-compute-virtualmachine" {
     source  = "Azure/avm-res-compute-virtualmachine/azurerm"
@@ -91,12 +91,11 @@ module "avm-res-compute-virtualmachine" {
             name = module.naming.network_interface.name_unique
             ip_configurations = {
                 ip_configuration_1 = {
-                    name                          = "${module.naming.network_interface.name_unique}-ipconfig1"
-                    subnet_id                     = var.subnet_id
-                    private_ip_address_allocation = "Dynamic"
-                    public_ip_address_allocation  = "Dynamic"
-                    public_ip_address_sku         = "Standard"
-                    public_ip_address_zone        = random_integer.zone_index.result
+                    name                            = "${module.naming.network_interface.name_unique}-ipconfig1"
+                    private_ip_subnet_resource_id   = data.azurerm_subnet.subnet_data.id
+                    private_ip_address_allocation   = "Dynamic"
+                    create_public_ip_address        = var.create_public_ip_address
+                    public_ip_address_name          = "${module.naming.network_interface.name_unique}-publicip"
                 }
             }
         }
@@ -118,6 +117,7 @@ module "avm-res-compute-virtualmachine" {
         sku       = var.source_image_reference.sku
         version   = var.source_image_reference.version
     }
+    encryption_at_host_enabled = false
 }
 
 # resource "random_string" "unique_suffix" {
