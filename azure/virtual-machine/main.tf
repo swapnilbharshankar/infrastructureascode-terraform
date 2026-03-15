@@ -105,7 +105,7 @@ module "avm-res-compute-virtualmachine" {
              public_key_path = var.public_key_path
         }
     }
-    admin_username      = var.username
+    os_type = "Linux"
     os_disk = {
         caching              = "ReadWrite"
         storage_account_type = "Standard_LRS"
