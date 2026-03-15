@@ -73,16 +73,17 @@ module "vm_sku" {
 }
 
 data "azurerm_subnet" "subnet_data" {
-  name                 = "${var.vnet_name}-${var.subnet_name}"
-  virtual_network_name = var.vnet_name
-  resource_group_name  = var.resource_group_name
+    name                 = "${var.vnet_name}-${var.subnet_name}"
+    virtual_network_name = var.vnet_name
+    resource_group_name  = var.resource_group_name
 }
 
 module "avm-res-compute-virtualmachine" {
     source  = "Azure/avm-res-compute-virtualmachine/azurerm"
     version = "0.20.0"
 
-    name                = var.name
+    for_each = { for id, virtual_machine in var.virtual_machines : virtual_machine.name => virtual_machine }
+    name                = each.value.name
     resource_group_name = var.resource_group_name
     location            = var.location
     zone                = random_integer.zone_index.result
@@ -94,7 +95,7 @@ module "avm-res-compute-virtualmachine" {
                     name                            = "${module.naming.network_interface.name_unique}-ipconfig1"
                     private_ip_subnet_resource_id   = data.azurerm_subnet.subnet_data.id
                     private_ip_address_allocation   = "Dynamic"
-                    create_public_ip_address        = var.create_public_ip_address
+                    create_public_ip_address        = each.value.create_public_ip_address
                     public_ip_address_name          = "${module.naming.network_interface.name_unique}-publicip"
                 }
             }
@@ -102,8 +103,8 @@ module "avm-res-compute-virtualmachine" {
     }
     account_credentials = {
         admin_credentials = {
-             username = var.username
-             public_key_path = var.public_key_path
+             username = each.value.username
+             public_key_path = each.value.public_key_path
         }
     }
     os_type = "Linux"
@@ -112,62 +113,10 @@ module "avm-res-compute-virtualmachine" {
         storage_account_type = "Standard_LRS"
     }
     source_image_reference = {
-        publisher = var.source_image_reference.publisher
-        offer     = var.source_image_reference.offer
-        sku       = var.source_image_reference.sku
-        version   = var.source_image_reference.version
+        publisher = each.value.source_image_reference.publisher
+        offer     = each.value.source_image_reference.offer
+        sku       = each.value.source_image_reference.sku
+        version   = each.value.source_image_reference.version
     }
     encryption_at_host_enabled = false
 }
-
-# resource "random_string" "unique_suffix" {
-#   length  = 6
-#   special = false
-#   upper   = false
-# }
-
-# data "azurerm_subnet" "subnet_data" {
-#   name                 = var.subnet_name
-#   virtual_network_name = var.vnet_name
-#   resource_group_name  = var.resource_group_name
-# }
-
-# resource "azurerm_network_interface" "nic" {
-#     name                = "${var.name}-nic-${random_string.unique_suffix.result}"
-#     location            = var.location
-#     resource_group_name = var.resource_group_name
-
-#     ip_configuration {
-#         name                          = "internal"
-#         subnet_id                     = data.azurerm_subnet.subnet_data.id
-#         private_ip_address_allocation = "Dynamic"
-#     }
-# }
-
-# resource "azurerm_linux_virtual_machine" "example" {
-#     name                = var.name
-#     resource_group_name = var.resource_group_name
-#     location            = var.location
-#     size                = var.size
-#     admin_username      = var.username
-#     network_interface_ids = [
-#         azurerm_network_interface.nic.id,
-#     ]
-
-#     admin_ssh_key {
-#         username   = var.username
-#         public_key = file(var.public_key_path)
-#     }
-
-#     os_disk {
-#         caching              = "ReadWrite"
-#         storage_account_type = "Standard_LRS"
-#     }
-
-#     source_image_reference {
-#         publisher = var.source_image_reference.publisher
-#         offer     = var.source_image_reference.offer
-#         sku       = var.source_image_reference.sku
-#         version   = var.source_image_reference.version
-#     }
-# }
