@@ -16,10 +16,10 @@ variable "resource_group_name" {
     default     = "azure-free"
 }
 
-variable "subnet_name" {
-    description = "Name of the subnet to which the VM will be connected"
+variable "subnet_id" {
+    description = "ID of the subnet to which the VM will be connected"
     type        = string
-    default     = "private-subnet1"
+    default     = "id-of-the-subnet"
 }
 
 variable "location" {

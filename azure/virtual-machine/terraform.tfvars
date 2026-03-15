@@ -1,7 +1,7 @@
 vnet_name = "swapnil"
 name = "swapnil-vm"
 resource_group_name = "azure-free"
-subnet_name = "swapnil-public-subnet1"
+subnet_id = "subnet-id"
 location = "centralindia"
 size = "Standard_B2as_v2"
 username = "adminuser"
