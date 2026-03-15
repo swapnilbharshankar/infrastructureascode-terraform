@@ -92,6 +92,7 @@ module "avm-res-compute-virtualmachine" {
             ip_configurations = {
                 ip_configuration_1 = {
                     name                          = "${module.naming.network_interface.name_unique}-ipconfig1"
+                    subnet_id                     = var.subnet_id
                     private_ip_address_allocation = "Dynamic"
                     public_ip_address_allocation  = "Dynamic"
                     public_ip_address_sku         = "Standard"
