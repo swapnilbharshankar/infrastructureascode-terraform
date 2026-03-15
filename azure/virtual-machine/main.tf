@@ -94,6 +94,7 @@ module "avm-res-compute-virtualmachine" {
                     name                          = "${module.naming.network_interface.name_unique}-ipconfig1"
                     public_ip_address_resource_id = var.subnet_id
                     private_ip_address_allocation = "Dynamic"
+                    public_ip_address_allocation  = "Dynamic"
                 }
             }
         }
