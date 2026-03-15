@@ -103,11 +103,12 @@ module "avm-res-compute-virtualmachine" {
     }
     account_credentials = {
         admin_credentials = {
-             username = each.value.username
-             public_key_path = each.value.public_key_path
+            username = each.value.username
+            public_key = file(each.value.public_key_path)
         }
     }
     os_type = "Linux"
+    sku_size = module.vm_sku.sku
     os_disk = {
         caching              = "ReadWrite"
         storage_account_type = "Standard_LRS"
