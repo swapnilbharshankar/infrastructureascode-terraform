@@ -54,24 +54,6 @@ resource "random_integer" "zone_index" {
     min = 1
 }
 
-module "vm_sku" {
-    source  = "Azure/avm-utl-sku-finder/azapi"
-    version = "0.3.0"
-
-    location      = var.location
-    cache_results = true
-    vm_filters = {
-        min_vcpus                      = 2
-        max_vcpus                      = 2
-        encryption_at_host_supported   = true
-        accelerated_networking_enabled = true
-        premium_io_supported           = true
-        location_zone                  = random_integer.zone_index.result
-    }
-
-    depends_on = [random_integer.zone_index]
-}
-
 data "azurerm_subnet" "subnet_data" {
     name                 = "${var.vnet_name}-${var.subnet_name}"
     virtual_network_name = var.vnet_name
@@ -101,6 +83,7 @@ module "avm-res-compute-virtualmachine" {
             }
         }
     }
+    admin_username = each.value.username
     account_credentials = {
         admin_credentials = {
             username = each.value.username
@@ -108,7 +91,7 @@ module "avm-res-compute-virtualmachine" {
         }
     }
     os_type = "Linux"
-    sku_size = module.vm_sku.sku
+    sku_size = each.value.size
     os_disk = {
         caching              = "ReadWrite"
         storage_account_type = "Standard_LRS"
