@@ -1,8 +1,8 @@
 # This ensures we have unique CAF compliant names for our resources.
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.2"
-}
+# module "naming" {
+#   source  = "Azure/naming/azurerm"
+#   version = "0.4.2"
+# }
 
 # Fetching the public IP address of the Terraform executor.
 data "http" "public_ip" {
