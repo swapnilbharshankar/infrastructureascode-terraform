@@ -42,6 +42,18 @@ variable "public" {
     ]
 }
 
+variable "public_routes" {
+    description = "A list of routes to create in the public route table."
+    type = list(object({
+        name                = string
+        address_prefix      = string
+        next_hop_type       = string
+        next_hop_ip_address = string
+    }))
+    default = []
+  
+}
+
 variable "private" {
     description = "private subnets for the virtual network"
     type = list(object({ name = string, cidr = list(string) }))
@@ -55,4 +67,22 @@ variable "private" {
             cidr = ["10.0.4.0/24"]
         }
     ]
+}
+
+variable "private_routes" {
+    description = "A list of routes to create in the private route table."
+    type = list(object({
+        name                = string
+        address_prefix      = string
+        next_hop_type       = string
+        next_hop_ip_address = string
+    }))
+    default = []
+  
+}
+
+variable "tags" {
+    description = "Tags for the virtual network"
+    type = map(string)
+    default = {}
 }

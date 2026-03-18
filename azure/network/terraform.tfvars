@@ -21,3 +21,12 @@ private = [
         cidr = ["10.0.4.0/24"]
     }
 ]
+
+public_routes = [
+    {
+    name = "default-route"
+    address_prefix = "0.0.0.0/0"
+    next_hop_type = "Internet"
+    next_hop_ip_address = null
+    }
+]
