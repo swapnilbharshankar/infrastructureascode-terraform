@@ -18,4 +18,5 @@ output "private_subnets_ids" {
     value = {
         for name, subnet in azurerm_subnet.private :
         name => subnet.id
+    }
 }
