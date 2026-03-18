@@ -12,3 +12,10 @@ output "public_subnet_ids" {
         name => subnet.id
     }
 }
+
+output "private_subnets_ids" {
+    description = "A map of private subnet IDs created by the virtual network module."
+    value = {
+        for name, subnet in azurerm_subnet.private :
+        name => subnet.id
+}
