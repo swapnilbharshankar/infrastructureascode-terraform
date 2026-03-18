@@ -48,27 +48,24 @@ resource "azurerm_subnet" "public" {
     # }
 }
 
-# resource "azurerm_subnet" "this" {
-#     depends_on = [ azurerm_virtual_network.this ]
-#     for_each = merge(
-#         { for i in range(length(var.private)) : "${var.private[i].name}-${i}" => var.private[i] },
-#         { for i in range(length(var.public)) : "${var.public[i].name}-${i}" => var.public[i] }
-#     )
-#     name                 = "${var.name}-${each.value.name}"
-#     resource_group_name  = var.resource_group_name
-#     virtual_network_name = azurerm_virtual_network.this.name
-#     address_prefixes     = each.value.cidr
-#     # dynamic "delegation" {
-#     #     for_each = each.value.delegation != null ? [each.value.delegation] : []
-#     #     content {
-#     #         name = delegation.value.name
-#     #         service_delegation {
-#     #             name    = delegation.value.service_delegation.name
-#     #             actions = delegation.value.service_delegation.actions
-#     #         }
-#     #     }
-#     # }
-# }
+resource "azurerm_subnet" "private" {
+    depends_on = [ azurerm_virtual_network.this ]
+    for_each = { for i in range(length(var.private)) : "${var.private[i].name}-${i}" => var.private[i] }
+    name                 = "${var.name}-${each.value.name}"
+    resource_group_name  = var.resource_group_name
+    virtual_network_name = azurerm_virtual_network.this.name
+    address_prefixes     = each.value.cidr
+    # dynamic "delegation" {
+    #     for_each = each.value.delegation != null ? [each.value.delegation] : []
+    #     content {
+    #         name = delegation.value.name
+    #         service_delegation {
+    #             name    = delegation.value.service_delegation.name
+    #             actions = delegation.value.service_delegation.actions
+    #         }
+    #     }
+    # }
+}
 
 resource "azurerm_route_table" "public" {
     location            = var.location
@@ -85,20 +82,20 @@ resource "azurerm_route_table" "public" {
     }
 }
 
-# resource "azurerm_route_table" "private" {
-#     location            = var.location
-#     name                = "${var.name}-private-route-table"
-#     resource_group_name = var.resource_group_name
-#     dynamic "route" {
-#         for_each = var.private_routes == null ? [] : { for route in var.private_routes : route.value.name => route.value }  
-#         content {
-#             name           = route.value.name
-#             address_prefix = route.value.address_prefix
-#             next_hop_type  = route.value.next_hop_type
-#             next_hop_in_ip_address = lookup(route.value, "next_hop_ip_address", null)
-#         }
-#     }
-# }
+resource "azurerm_route_table" "private" {
+    location            = var.location
+    name                = "${var.name}-private-route-table"
+    resource_group_name = var.resource_group_name
+    dynamic "route" {
+        for_each = { for route in var.private_routes : route.name => route }  
+        content {
+            name           = route.value.name
+            address_prefix = var.address_space[0]
+            next_hop_type  = route.value.next_hop_type
+            next_hop_in_ip_address = lookup(route.value, "next_hop_ip_address", null)
+        }
+    }
+}
 
 resource "azurerm_subnet_route_table_association" "public" {
     for_each = { for name, subnet in azurerm_subnet.public : name => subnet }
@@ -106,11 +103,11 @@ resource "azurerm_subnet_route_table_association" "public" {
     route_table_id = azurerm_route_table.public.id
 }
 
-# resource "azurerm_subnet_route_table_association" "private" {
-#     for_each = { for name, subnet in azurerm_subnet.this : name => subnet if contains(keys(var.private), split("-", name)[0]) }
-#     subnet_id = each.value.id
-#     route_table_id = azurerm_route_table.private.id
-# }
+resource "azurerm_subnet_route_table_association" "private" {
+    for_each = { for name, subnet in azurerm_subnet.private : name => subnet }
+    subnet_id = each.value.id
+    route_table_id = azurerm_route_table.private.id
+}
 
 
 ##

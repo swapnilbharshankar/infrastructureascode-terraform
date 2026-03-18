@@ -30,3 +30,9 @@ public_routes = [
     next_hop_ip_address = null
     }
 ]
+
+private_routes = [ {
+    name = "default-routes"
+    next_hop_type = "VnetLocal"
+    next_hop_ip_address = null
+} ]
