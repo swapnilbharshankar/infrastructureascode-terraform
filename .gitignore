@@ -20,3 +20,4 @@ terragrunt
 .licensei.cache
 bin
 *.cache
+.terraform.lock.hcl
