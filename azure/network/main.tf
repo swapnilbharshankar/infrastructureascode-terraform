@@ -77,7 +77,7 @@ resource "azurerm_route_table" "public" {
             name           = route.value.name
             address_prefix = route.value.address_prefix
             next_hop_type  = route.value.next_hop_type
-            # next_hop_in_ip_address = lookup(route.value, "next_hop_ip_address", null)
+            next_hop_in_ip_address = lookup(route.value, "next_hop_in_ip_address", null)
         }
     }
 }
@@ -92,7 +92,7 @@ resource "azurerm_route_table" "private" {
             name           = route.value.name
             address_prefix = var.address_space[0]
             next_hop_type  = route.value.next_hop_type
-            # next_hop_in_ip_address = lookup(route.value, "next_hop_ip_address", null)
+            next_hop_in_ip_address = lookup(route.value, "next_hop_in_ip_address", null)
         }
     }
 }
